@@ -1,6 +1,5 @@
 import React from 'react';
 import Horizontal from './Horizontal.js';
-import 'react-rangeslider/lib/index.css';
 
 let context;
 let oscillator;
@@ -10,14 +9,18 @@ let panner;
 
 let initialState = {
   started: false,
-  volume: 1,
+  volume: 0.25,
   frequency: 250,
   running: false,
   time: 0,
-  timerOn: false,
   x: -500,
   y: 0,
   z: 0,
+  pulseOn: false,
+  rotationOn: true,
+  idealVolume: 0.25,
+  pulseFrequency: 300,
+  pulseDuration: 150,
 }
 
 class ToneGenerator extends React.Component {
@@ -27,13 +30,11 @@ class ToneGenerator extends React.Component {
     context = new AudioContext();
     oscillator = context.createOscillator();
     gainNode = context.createGain();
-
-    this.initListener();
     
+    this.initListener();
     this.initPanner();
 
     oscillator.connect(gainNode).connect(panner).connect(context.destination);
-    // track.connect(gainNode).connect(stereoPanner).connect(panner).connect(audioCtx.destination);
 
     this.initPannerRotation();
     this.initOscillator();
@@ -93,22 +94,30 @@ class ToneGenerator extends React.Component {
     panner.outerGain = 0.3;
   }
 
-  initPannerRotation() {
-    let rotationalVelocityDeg = 50; // deg / sec
-    let radius = 1000;
-    let pannerInterval = setInterval(() => {
-      let deltaTimeInSeconds = (Date.now() - this.state.start) / 1000
-      let angleDeg = 180 + rotationalVelocityDeg * deltaTimeInSeconds;
-      let angleRad = this.degToRad(angleDeg);
-      let x = radius * Math.cos(angleRad);
-      // let x = -500;
-      // let y = radius * Math.sin(angleRad);
-      let y = 0;
-      let z = radius * Math.sin(angleRad);
-      // let z = 0;
-      this.setState({x, y, z});
-    }, 37);
-    this.setState({pannerInterval})
+  pulse = () => {
+    if (this.state.pulseOn) {
+      this.setState({pulseOn: false});
+      clearInterval(this.state.pulseInterval);
+    } else {
+      let time = this.state.time;
+      this.setState({pulseStart: Date.now()})
+      let pulseInterval = setInterval(() => {
+
+        let { pulseFrequency, pulseDuration, volume, idealVolume } = this.state;
+        let elapsed = Date.now() - this.state.pulseStart;
+        if ((elapsed % pulseFrequency) < pulseDuration) {
+          if (volume !== idealVolume) {
+            this.setVolume(idealVolume);
+          }
+        } else {
+          if (volume !== 0) {
+            this.setVolume(0);
+          }
+        }
+      }, 10);
+      this.setState({pulseInterval})
+      this.setState({pulseOn: true});
+    }
   }
 
   setPannerValues(x, y, z) {
@@ -122,10 +131,10 @@ class ToneGenerator extends React.Component {
   start = () => {
     if (!this.state.started) {
       this.init();
-
+      this.setVolume(this.state.idealVolume);
     } else {
       context.resume();
-      this.setVolume(this.state.volume);
+      this.setVolume(this.state.idealVolume);
     }
     this.setState({running: true});
   }
@@ -153,7 +162,7 @@ class ToneGenerator extends React.Component {
     if (this.state.volume) {
       this.setVolume(0);
     } else {
-      this.setVolume(1);
+      this.setVolume(this.state.idealVolume);
     }
   }
 
@@ -165,6 +174,7 @@ class ToneGenerator extends React.Component {
     gainNode = undefined;
     clearInterval(this.state.timer);
     clearInterval(this.state.pannerInterval);
+    clearInterval(this.state.pulseInterval);
   }
 
   handleClick = (e) => {
@@ -175,6 +185,7 @@ class ToneGenerator extends React.Component {
   handleSlider = (value, name) => {
     if (name === 'volume') {
       this.setVolume(value);
+      this.setState({idealVolume: value});
     }
     if (name === 'frequency') {
       this.setFrequency(value);
@@ -187,6 +198,14 @@ class ToneGenerator extends React.Component {
     }
     if (name === 'z') {
       this.setState({z: value});
+    }
+    if (name === 'pulseFrequency') {
+      console.log(`in frew`)
+      this.setState({pulseFrequency: value});
+    }
+    if (name === 'pulseDuration') {
+      console.log(`in frewsss`)
+      this.setState({pulseDuration: value});
     }
   }
 
@@ -209,21 +228,51 @@ class ToneGenerator extends React.Component {
     return rad;
   }
 
+  initPannerRotation() {
+    let rotationalVelocityDeg = 50; // deg / sec
+    let radius = 1000;
+    let pannerInterval = setInterval(() => {
+      let deltaTimeInSeconds = (Date.now() - this.state.start) / 1000
+      let angleDeg = 180 + rotationalVelocityDeg * deltaTimeInSeconds;
+      let angleRad = this.degToRad(angleDeg);
+      let x = radius * Math.cos(angleRad);
+      // let x = -500;
+      // let y = radius * Math.sin(angleRad);
+      let y = 0;
+      let z = radius * Math.sin(angleRad);
+      // let z = 0;
+      this.setState({x, y, z});
+    }, 37);
+    this.setState({pannerInterval})
+  }
+  
+  initRotation() {
+    if (this.state.rotationOn) {
+      this.setState({rotationOn: false});
+      clearInterval(this.state.pannerInterval);
+
+
+    } else {
+      this.initPannerRotation();
+      this.setState({rotationOn: true});
+    }
+  }
+
   render() {
-    
-    let { volume, frequency, running, x, y, z, time } = this.state;
+    let { volume, frequency, running, x, y, z, time, pulseOn, pulseFrequency, pulseDuration } = this.state;
+
     this.setPannerValues(x, y, z);
     return (
       <>
-        <div>x: {Math.round(x*10)/10}</div>
-        <div>y: {Math.round(y*10)/10}</div>
-        <div>z: {Math.round(z*10)/10}</div>
-        <div>time: {time}</div>
+        <div>time (s): {time}</div>
         {/* <button name="time" onClick={(e) => {this.handleClick(e)}}>time</button> */}
         <button disabled={running} name="start" onClick={(e) => {this.handleClick(e)}}>start</button>
         <button disabled={!running} name="mute" onClick={(e) => {this.handleClick(e)}}>{volume? "mute" : "unmute"}</button>
         <button disabled={!running} name="reset" onClick={(e) => {this.handleClick(e)}}>reset</button>
+        <button name="pulse" onClick={(e) => {this.handleClick(e)}}>{pulseOn? "stop pulse" : "start pulse"}</button>
+        <button name="initRotation" onClick={(e) => {this.handleClick(e)}}>rotation</button>
         <Horizontal
+          displayName="Volume:"
           name="volume"
           min={0}
           max={2}
@@ -232,6 +281,7 @@ class ToneGenerator extends React.Component {
           onChange={this.handleSlider}
         />
         <Horizontal
+          displayName="Pitch:"
           name="frequency"
           min={0}
           max={2000}
@@ -239,8 +289,8 @@ class ToneGenerator extends React.Component {
           value={frequency}
           onChange={this.handleSlider}
         />
-        <label>X:</label>
         <Horizontal
+          displayName="X:"
           name="x"
           min={-1000}
           max={1000}
@@ -248,8 +298,8 @@ class ToneGenerator extends React.Component {
           value={x}
           onChange={this.handleSlider}
         />
-        <label>Y:</label>
         <Horizontal
+          displayName="Y:"
           name="y"
           min={-1000}
           max={1000}
@@ -257,13 +307,31 @@ class ToneGenerator extends React.Component {
           value={y}
           onChange={this.handleSlider}
         />
-        <label>Z:</label>
         <Horizontal
+          displayName="Z:"
           name="z"
           min={-1000}
           max={1000}
           step={1}
           value={z}
+          onChange={this.handleSlider}
+        />
+        <Horizontal
+          displayName="Pulse frequency:"
+          name="pulseFrequency"
+          min={50}
+          max={1000}
+          step={1}
+          value={pulseFrequency}
+          onChange={this.handleSlider}
+        />
+        <Horizontal
+          displayName="Pulse duration:"
+          name="pulseDuration"
+          min={50}
+          max={500}
+          step={1}
+          value={pulseDuration}
           onChange={this.handleSlider}
         />
       </>
