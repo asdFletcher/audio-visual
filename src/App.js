@@ -1,11 +1,15 @@
 import React from 'react';
 
+import ToneGenerator from './components/ToneGenerator.js';
+
 import './styles/reset.scss';
 import './styles/base.scss';
 
 function App() {
   return (
-    <h1>test test test test </h1>
+    <>
+      <ToneGenerator />
+    </>
   );
 }
 
