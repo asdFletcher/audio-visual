@@ -11,7 +11,6 @@ class Horizontal extends Component {
   }
 
   handleChange = (value) => {
-    // console.log(`🍊value: `, value);
     this.props.onChange(value, this.props.name);
   }
 
