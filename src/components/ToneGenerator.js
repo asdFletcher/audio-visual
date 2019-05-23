@@ -200,11 +200,9 @@ class ToneGenerator extends React.Component {
       this.setState({z: value});
     }
     if (name === 'pulseFrequency') {
-      console.log(`in frew`)
       this.setState({pulseFrequency: value});
     }
     if (name === 'pulseDuration') {
-      console.log(`in frewsss`)
       this.setState({pulseDuration: value});
     }
   }
@@ -285,7 +283,6 @@ class ToneGenerator extends React.Component {
           name="frequency"
           min={0}
           max={2000}
-          step={1}
           value={frequency}
           onChange={this.handleSlider}
         />
@@ -294,7 +291,6 @@ class ToneGenerator extends React.Component {
           name="x"
           min={-1000}
           max={1000}
-          step={1}
           value={x}
           onChange={this.handleSlider}
         />
@@ -303,7 +299,6 @@ class ToneGenerator extends React.Component {
           name="y"
           min={-1000}
           max={1000}
-          step={1}
           value={y}
           onChange={this.handleSlider}
         />
@@ -312,7 +307,6 @@ class ToneGenerator extends React.Component {
           name="z"
           min={-1000}
           max={1000}
-          step={1}
           value={z}
           onChange={this.handleSlider}
         />
@@ -321,7 +315,6 @@ class ToneGenerator extends React.Component {
           name="pulseFrequency"
           min={50}
           max={1000}
-          step={1}
           value={pulseFrequency}
           onChange={this.handleSlider}
         />
@@ -330,7 +323,6 @@ class ToneGenerator extends React.Component {
           name="pulseDuration"
           min={50}
           max={500}
-          step={1}
           value={pulseDuration}
           onChange={this.handleSlider}
         />

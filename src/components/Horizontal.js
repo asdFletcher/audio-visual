@@ -22,7 +22,7 @@ class Horizontal extends Component {
         <Slider
           min={this.props.min}
           max={this.props.max}
-          step={this.props.step}
+          step={this.props.step || 1}
           value={value}
           orientation='horizontal'
           onChange={this.handleChange}
