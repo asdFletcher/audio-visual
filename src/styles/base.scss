@@ -3,11 +3,6 @@
   box-sizing: border-box !important;
 }
 
-// fixes weird click-hold bug
-html, body {
-  // display: flex;
-}
-
 body {
   height: 300px;
   padding: 10px 10px 10px 10px;
@@ -16,14 +11,12 @@ button {
   margin: 10px;
   width: 80px;
 }
-
 #root {
   height: 100%;
 }
 .slider {
   padding-top: 15px;
   display: flex;
-  // width: 200px;
   margin: 0px 0px 10px 0px;
 }
 .rangeslider {
@@ -38,15 +31,14 @@ button {
   text-align: center;
   margin-left: 15px;
 }
-
 .slider-name {
   margin-right: 10px;
   width: 70px;
 }
-.rangeslider__labels {
+// fixes weird click-hold bug
+.rangeslider__labels {  
   z-index: -1
 }
-
 h1 {
   font-size: 30px;
 }

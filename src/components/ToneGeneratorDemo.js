@@ -1,5 +1,6 @@
 import React from 'react';
 import Horizontal from './Horizontal.js';
+import { degToRad } from '../util/util.js';
 
 let context;
 let oscillator;
@@ -23,7 +24,7 @@ let initialState = {
   pulseDuration: 150,
 }
 
-class ToneGenerator extends React.Component {
+class ToneGeneratorDemo extends React.Component {
   state = { ...initialState }
 
   init = () => {
@@ -221,18 +222,14 @@ class ToneGenerator extends React.Component {
     this.setState({timer});
   }
 
-  degToRad(deg) {
-    let rad = deg * (2 * 3.1415) / 360;
-    return rad;
-  }
-
   initPannerRotation() {
     let rotationalVelocityDeg = 50; // deg / sec
     let radius = 1000;
+    let start = Date.now();
     let pannerInterval = setInterval(() => {
-      let deltaTimeInSeconds = (Date.now() - this.state.start) / 1000
+      let deltaTimeInSeconds = (Date.now() - start) / 1000
       let angleDeg = 180 + rotationalVelocityDeg * deltaTimeInSeconds;
-      let angleRad = this.degToRad(angleDeg);
+      let angleRad = degToRad(angleDeg);
       let x = radius * Math.cos(angleRad);
       // let x = -500;
       // let y = radius * Math.sin(angleRad);
@@ -248,8 +245,6 @@ class ToneGenerator extends React.Component {
     if (this.state.rotationOn) {
       this.setState({rotationOn: false});
       clearInterval(this.state.pannerInterval);
-
-
     } else {
       this.initPannerRotation();
       this.setState({rotationOn: true});
@@ -331,4 +326,4 @@ class ToneGenerator extends React.Component {
   }
 }
 
-export default ToneGenerator;
+export default ToneGeneratorDemo;

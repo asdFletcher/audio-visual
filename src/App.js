@@ -1,14 +1,18 @@
 import React from 'react';
 
-import ToneGenerator from './components/ToneGenerator.js';
+import ToneGeneratorDemo from './components/ToneGeneratorDemo.js';
+import PointSources from './components/PointSources.js';
 
 import './styles/reset.scss';
 import './styles/base.scss';
 
+
+
 function App() {
   return (
     <>
-      <ToneGenerator />
+      {/* <ToneGeneratorDemo /> */}
+      <PointSources />
     </>
   );
 }
