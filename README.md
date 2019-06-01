@@ -39,3 +39,6 @@ Use Wide Spectrum Sources
 For the same reasons that pure tones are poor for spatialization, broad spectrum sounds work well by providing lots of frequencies for the HRTF to work with. They also help mask audible glitches that result from dynamic changes to HRTFs, pan, and attenuation. In addition to a broad spectrum of frequencies, ensure that there is significant frequency content above 1500 Hz, since this is used heavily by humans for sound localization.
 
 Low frequency sounds are difficult for humans to locate - this is why home theater systems use a monophonic subwoofer channel. If a sound is predominantly low frequency (rumbles, drones, shakes, et cetera), then you can avoid the overhead of spatialization and use pan/attenuation instead.
+
+Google audio:
+https://developers.google.com/vr/reference/ios-ndk/group/audio
